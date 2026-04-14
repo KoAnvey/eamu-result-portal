@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="login.css" />
+    <title>Document</title>
+  </head>
+  <body>
+
+    <main class="Student Login">
+      <section class="login-card">
+        <!--logo-->
+        <img src="../image/eamuLogo.jpg" alt="EAMU Logo" class="logo">
+
+        <!--Heading-->
+        <h1>EAMU Result Portal</h1>
+        <p>Welcome User, Please fill in the information to view your academic results.</p>
+
+        <!--Login Form-->
+        <form method="post" id="login_form">
+          <div class="form-group">
+            <label for="enrollment_id">Enrollment ID: </label>
+            <input
+              type="text"
+              name="enrollment_id"
+              id="enrollment_id"
+              maxlength="8"
+              pattern="[0-9]{7}[A-Z]"
+              placeholder="Enter your Enrollment ID"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="dob">Date of Birth: </label>
+            <input type="date" name="dob" id="dob" required />
+          </div>
+          <div class="form-group form-btn">
+            <button type="submit" id="btnLogin">Login</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

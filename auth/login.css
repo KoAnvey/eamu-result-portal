@@ -1,0 +1,219 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Sego UI", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+main.student-login{
+  width:100%;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-card{
+  background: #ffffff;
+  width:100%;
+  max-width: 400px;
+  padding:40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.login-card .logo{
+  width:80px;
+  height:auto;
+  margin-bottom:20px;
+  border-radius:50%;
+}
+
+.login-card h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.login-card p{
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.form-group label{
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input{
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.form-group input:focus{
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+.form-btn button{
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.form-btn button:hover{
+  background-color: #0056b3;
+}
+
+.mobile-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.mobile-group input {
+  flex: 1;
+  min-width: 0;
+  height: 45px;
+  padding: 12px 15px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.mobile-group button {
+  height: 45px;
+  padding: 0 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: none;
+  background-color: #28a745;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.mobile-group button:hover {
+  background-color: #218838;
+}
+
+#sendOTP {
+  background-color: #28a745;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#sendOTP:hover {
+  background-color: #218838;
+}
+
+.otp-boxes{
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.otp-boxes input{
+  width: 40px;
+  height: 45px;
+  text-align: center;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+.otp-boxes input:focus{
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.2);
+  outline: none;
+}
+
+@media (max-width: 768px){
+  .login-card{
+    padding: 30px 20px;
+  }
+
+  .login-card h1{
+    font-size: 20px;
+  }
+
+  .login-card p{
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px){
+  .login-card{
+    padding: 25px 15px;
+  }
+
+  .login-card h1{
+    font-size: 18px;
+  }
+
+  .login-card p{
+    font-size: 12px;
+  }
+
+  .form-group input{
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .form-btn button{
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  #sendOTP{
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .otp-boxes input{
+    width: 35px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .mobile-group{
+    flex-direction: column;
+    gap: 8px;
+  }
+}
