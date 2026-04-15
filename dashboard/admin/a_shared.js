@@ -1,5 +1,5 @@
 // ============================================================
-//  EAMU — Shared Data & Utilities
+//  EAMU — Shared Data & Utilities (Enhanced)
 // ============================================================
 
 // ── Majors and their subjects ──────────────────────────────
@@ -117,7 +117,6 @@ const MAJORS = {
   },
 };
 
-// ADD THIS LINE RIGHT HERE:
 const MAJOR_KEYS = Object.keys(MAJORS);
 
 // Add helper function to get subjects for a specific year+term
@@ -197,6 +196,12 @@ function scoreKey(enrollmentId, subject) {
   return `${enrollmentId}|${subject}`;
 }
 
+// ── Helper: Check if results are published for a session ───
+function isSessionPublished(year, term) {
+  const published = loadPublished();
+  return published.some((p) => p.year === year && p.term === term);
+}
+
 // ── Toast Notification ─────────────────────────────────────
 function showToast(msg, type = "info") {
   let container = document.getElementById("toast-container");
@@ -250,6 +255,21 @@ function highlightNav() {
   document.querySelectorAll(".topbar-nav a").forEach((a) => {
     a.classList.toggle("active", a.getAttribute("href") === page);
   });
+}
+
+// ── Format date helper ─────────────────────────────────────
+function formatDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return (
+    d.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }) +
+    " " +
+    d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+  );
 }
 
 document.addEventListener("DOMContentLoaded", () => {

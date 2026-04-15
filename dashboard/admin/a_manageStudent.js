@@ -1,4 +1,4 @@
-// a_manageStudent.js
+// a_manageStudent.js (updated with better validation)
 document.addEventListener("DOMContentLoaded", () => {
   let students = loadStudents();
   let editTargetId = null;
@@ -47,10 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="td-id">${i + 1}</td>
-          <td class="td-id">${s.id}</td>
-          <td class="td-name">${s.name}</td>
+          <td class="td-id">${escapeHtml(s.id)}</td>
+          <td class="td-name">${escapeHtml(s.name)}</td>
           <td>${s.dob || "—"}</td>
-          <td><span class="badge badge-blue">${s.major}</span></td>
+          <td><span class="badge badge-blue">${escapeHtml(s.major)}</span></td>
           <td>${s.year}</td>
           <td>${s.term}</td>
           <td>
@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ── Open Add Modal ────────────────────────────────────────
   document.getElementById("btn-add-student").addEventListener("click", () => {
     document.getElementById("add-student-form").reset();
+    // Clear any validation errors
     openModal("modal-add");
   });
 
@@ -94,10 +95,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const year = document.getElementById("f-year").value;
     const term = document.getElementById("f-term").value;
 
-    if (!id || !name || !dob || !major || !year || !term) {
-      showToast("Please fill in all required fields.", "error");
+    // Enhanced validation
+    if (!id) {
+      showToast("Enrollment ID is required.", "error");
       return;
     }
+    if (!name) {
+      showToast("Student name is required.", "error");
+      return;
+    }
+    if (!dob) {
+      showToast("Date of birth is required.", "error");
+      return;
+    }
+    if (!major) {
+      showToast("Please select a major.", "error");
+      return;
+    }
+    if (!year) {
+      showToast("Please select a year.", "error");
+      return;
+    }
+    if (!term) {
+      showToast("Please select a term.", "error");
+      return;
+    }
+
     if (students.some((s) => s.id === id)) {
       showToast("Enrollment ID already exists.", "error");
       return;
@@ -138,12 +161,35 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-save-edit").addEventListener("click", () => {
     const idx = students.findIndex((s) => s.id === editTargetId);
     if (idx === -1) return;
-    students[idx].name = document.getElementById("e-name").value.trim();
+
+    const newName = document.getElementById("e-name").value.trim();
+    const newMajor = document.getElementById("e-major").value;
+    const newYear = document.getElementById("e-year").value;
+    const newTerm = document.getElementById("e-term").value;
+
+    if (!newName) {
+      showToast("Student name is required.", "error");
+      return;
+    }
+    if (!newMajor) {
+      showToast("Please select a major.", "error");
+      return;
+    }
+    if (!newYear) {
+      showToast("Please select a year.", "error");
+      return;
+    }
+    if (!newTerm) {
+      showToast("Please select a term.", "error");
+      return;
+    }
+
+    students[idx].name = newName;
     students[idx].dob = document.getElementById("e-dob").value;
     students[idx].gender = document.getElementById("e-gender").value;
-    students[idx].major = document.getElementById("e-major").value;
-    students[idx].year = document.getElementById("e-year").value;
-    students[idx].term = document.getElementById("e-term").value;
+    students[idx].major = newMajor;
+    students[idx].year = newYear;
+    students[idx].term = newTerm;
     saveStudents(students);
     closeModal("modal-edit");
     renderTable();
@@ -175,3 +221,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}

@@ -39,6 +39,20 @@
       font-size: 0.78rem; color: var(--ink3); margin-bottom: 16px;
     }
     .draft-actions { display: flex; gap: 8px; }
+    .empty-draft {
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .empty-draft svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      color: var(--ink4);
+    }
+    .empty-draft p {
+      color: var(--ink3);
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
@@ -60,8 +74,8 @@
   <nav class="topbar-nav" id="topbar-nav">
     <a href="a_dashboard.html">Home</a>
     <a href="a_manageStudent.html">Manage Students</a>
-    <a href="a_scoreBoard.html">Score Board</a>
-    <a href="a_resultPublish.html">Result Publish</a>
+    <a href="a_createResult.html">Create Result</a>
+    <a href="a_resultPublish.html">Published Results</a>
     <a href="a_myDraft.html">My Drafts</a>
   </nav>
   <div class="topbar-user">
@@ -95,39 +109,16 @@
  
     <div class="draft-grid" id="draft-grid"></div>
  
-    <div class="empty-state" id="draft-empty" style="display:none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      <p>No drafts saved yet. Go to Result Publish and save your work as a draft.</p>
-    </div>
- 
-    <!-- Published results section -->
-    <div style="margin-top:40px;">
-      <div class="page-header" style="margin-bottom:16px;">
-        <div class="page-header-label">Archive</div>
-        <h1 style="font-size:1.4rem;">Published Results</h1>
-        <p>Finalized result sessions that have been published.</p>
-      </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Year</th>
-                <th>Term</th>
-                <th>Students</th>
-                <th>Published At</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="published-tbody"></tbody>
-          </table>
-          <div class="empty-state" id="published-empty" style="display:none;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-            <p>No published results yet.</p>
-          </div>
-        </div>
-      </div>
+    <div class="empty-draft" id="draft-empty" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      <p>No drafts saved yet.</p>
+      <button class="btn btn-primary" onclick="window.location.href='a_createResult.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+        Create New Result
+      </button>
     </div>
  
   </main>
@@ -137,7 +128,10 @@
 <div class="modal-overlay" id="modal-del-draft">
   <div class="modal confirm-modal">
     <div class="confirm-icon" style="background:rgba(220,53,69,0.12);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      </svg>
     </div>
     <div class="modal-title">Delete Draft?</div>
     <p id="del-draft-text">Are you sure you want to delete this draft?</p>

@@ -3,237 +3,204 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Result Publish · EAMU</title>
+  <title>Published Results · EAMU</title>
   <link rel="stylesheet" href="a_dashboard.css">
   <style>
-    .publish-setup {
+    .publish-date {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--ok);
+    }
+    .result-card {
       background: var(--wh);
       border: 1px solid var(--s2);
       border-radius: var(--radius-lg);
-      padding: 28px;
-      margin-bottom: 24px;
-    }
-    .publish-setup h2 {
-      font-family: var(--font-display);
-      font-size: 1rem; color: var(--ink);
-      margin-bottom: 18px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .result-table-wrap { overflow-x: auto; }
-    .score-input-cell { display: flex; align-items: center; gap: 6px; }
-    .grade-display {
-      display: inline-flex; align-items: center;
-      font-size: 0.8rem; font-weight: 700;
-      padding: 3px 10px; border-radius: 20px;
-      min-width: 44px; justify-content: center;
-    }
-    .section-divider {
-      display: flex; align-items: center; gap: 12px;
-      margin: 10px 0 6px;
-    }
-    .section-divider span {
-      font-size: 0.7rem; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--m);
-      font-weight: 600; white-space: nowrap;
-    }
-    .section-divider::before, .section-divider::after {
-      content: ''; flex: 1; height: 1px;
-      background: var(--s2);
-    }
-    .subject-group-header td {
-      background: var(--m3);
-      font-size: 0.7rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--m);
-      font-weight: 600; padding: 8px 16px;
-    }
-    .action-bar {
-      display: flex; gap: 12px; flex-wrap: wrap;
-      align-items: center; margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--s2);
-    }
-    .avg-display {
-      font-family: var(--font-display);
-      font-size: 1.4rem; font-weight: 700;
-      color: var(--m);
-    }
-    .avg-label { font-size: 0.75rem; color: var(--ink3); margin-top: 2px; }
-    .mini-stat {
-      text-align: center;
-      background: var(--s1);
-      border: 1px solid var(--s2);
-      border-radius: 10px; padding: 12px 18px;
-    }
-    .student-block {
-      background: var(--wh);
-      border: 1px solid var(--s2);
-      border-radius: var(--radius);
-      margin-bottom: 12px;
+      margin-bottom: 20px;
       overflow: hidden;
       transition: all 0.2s;
     }
-    .student-block-header {
+    .result-card:hover {
+      border-color: var(--m4);
+      box-shadow: var(--shadow-sm);
+    }
+    .result-card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 20px;
-      background: var(--s1);
+      padding: 20px 24px;
+      background: linear-gradient(135deg, var(--s1), var(--wh));
       cursor: pointer;
-      transition: background 0.2s;
+      border-bottom: 1px solid var(--s2);
     }
-    .student-block-header:hover {
+    .result-card-header:hover {
       background: var(--m3);
     }
-    .s-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .s-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--m), var(--m2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      color: var(--wh);
-      font-size: 0.9rem;
-    }
-    .s-name {
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .s-id {
-      font-size: 0.7rem;
-      color: var(--ink3);
-    }
-    .s-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .s-avg-chip {
-      font-size: 0.75rem;
-      background: var(--m3);
-      padding: 4px 10px;
-      border-radius: 20px;
-      color: var(--m);
-      font-weight: 600;
-    }
-    .s-progress {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .s-pbar-wrap {
-      width: 80px;
-      height: 4px;
-      background: var(--s2);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .s-pbar-fill {
-      height: 100%;
-      background: var(--m);
-      border-radius: 2px;
-      transition: width 0.3s;
-    }
-    .collapse-chevron {
-      transition: transform 0.2s;
-    }
-    .student-block.collapsed .collapse-chevron {
-      transform: rotate(-90deg);
-    }
-    .subject-rows {
-      padding: 0;
-      transition: all 0.2s;
-    }
-    .student-block.collapsed .subject-rows {
-      display: none;
-    }
-    .subject-row {
+    .result-info {
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 12px 20px;
-      border-top: 1px solid var(--s2);
+      flex-wrap: wrap;
     }
-    .subject-row:hover {
+    .result-year-term {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .result-badge {
+      background: var(--ok2);
+      color: var(--ok);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .result-date {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--ink3);
+    }
+    .result-date svg {
+      width: 14px;
+      height: 14px;
+    }
+    .student-count {
+      background: var(--m3);
+      color: var(--m);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .chevron-icon {
+      transition: transform 0.2s;
+    }
+    .result-card.collapsed .chevron-icon {
+      transform: rotate(-90deg);
+    }
+    .result-details {
+      padding: 0;
+      transition: all 0.2s;
+    }
+    .result-card.collapsed .result-details {
+      display: none;
+    }
+    .student-result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--s2);
+      transition: background 0.15s;
+    }
+    .student-result-row:hover {
       background: var(--s1);
     }
-    .subj-label {
+    .student-result-row:last-child {
+      border-bottom: none;
+    }
+    .student-info {
       flex: 1;
+    }
+    .student-name {
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .student-id {
+      font-size: 0.7rem;
+      color: var(--ink3);
+      font-family: monospace;
+    }
+    .student-major {
+      font-size: 0.7rem;
+      color: var(--m);
+      margin-top: 2px;
+    }
+    .student-gpa {
+      text-align: right;
+      min-width: 100px;
+    }
+    .gpa-value {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--m);
+    }
+    .gpa-label {
+      font-size: 0.65rem;
+      color: var(--ink3);
+      letter-spacing: 0.05em;
+    }
+    .view-scores-btn {
+      margin-left: 20px;
+    }
+    .subjects-modal {
+      max-width: 600px;
+    }
+    .subject-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .subject-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--s2);
+    }
+    .subject-item:last-child {
+      border-bottom: none;
+    }
+    .subject-name {
       font-weight: 500;
       color: var(--ink2);
     }
-    .subj-num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      background: var(--m3);
-      color: var(--m);
-      border-radius: 6px;
-      font-size: 0.7rem;
+    .subject-score {
       font-weight: 700;
-      margin-right: 10px;
+      font-size: 1rem;
+      color: var(--ink);
     }
-    .score-wrap input {
-      width: 100px;
-      text-align: center;
-      font-weight: 600;
-    }
-    .grade-pill {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.75rem;
-      min-width: 48px;
+    .subject-grade {
+      min-width: 50px;
       text-align: center;
     }
-    .gp-Ap { background: var(--ok2); color: #166b3e; }
-    .gp-A { background: var(--ok2); color: var(--ok); }
-    .gp-B { background: #e6f1fb; color: var(--info); }
-    .gp-C { background: var(--m3); color: var(--m); }
-    .gp-D { background: var(--warn2); color: var(--warning); }
-    .gp-F { background: rgba(220,53,69,0.1); color: var(--danger); }
-    .gp-empty { background: var(--s1); color: var(--ink3); }
-    .score-error {
-      border-color: var(--danger) !important;
-      box-shadow: 0 0 0 2px rgba(220,53,69,0.2) !important;
-    }
-    .overall-progress {
-      background: var(--s1);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      margin-bottom: 20px;
-    }
-    .progress-header {
+    .filter-section {
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 0.8rem;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 24px;
     }
-    .progress-bar-wrap {
-      height: 6px;
-      background: var(--s2);
-      border-radius: 3px;
-      overflow: hidden;
+    .stats-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
     }
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--m);
-      border-radius: 3px;
-      transition: width 0.3s;
+    .stat-summary-card {
+      background: var(--wh);
+      border: 1px solid var(--s2);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .stat-summary-value {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--m);
+    }
+    .stat-summary-label {
+      font-size: 0.75rem;
+      color: var(--ink3);
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
- 
+
 <header class="topbar">
   <a href="a_dashboard.html" class="topbar-brand">
     <div class="topbar-logo">
@@ -251,8 +218,8 @@
   <nav class="topbar-nav" id="topbar-nav">
     <a href="a_dashboard.html">Home</a>
     <a href="a_manageStudent.html">Manage Students</a>
-    <a href="a_scoreBoard.html">Score Board</a>
-    <a href="a_resultPublish.html">Result Publish</a>
+    <a href="a_createResult.html">Create Result</a>
+    <a href="a_publishedResults.html" class="active">Published Results</a>
     <a href="a_myDraft.html">My Drafts</a>
   </nav>
   <div class="topbar-user">
@@ -262,119 +229,92 @@
   </div>
   <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
 </header>
- 
+
 <div class="page-wrapper">
   <main class="main-content">
- 
+
     <div class="page-header">
-      <div class="page-header-label">Result Management</div>
-      <h1>Publish Results</h1>
-      <p>Select a year and term to load students, enter scores, and publish.</p>
+      <div class="page-header-label">Results Archive</div>
+      <h1>Published Results</h1>
+      <p>View all published results with their publication dates and student performance.</p>
     </div>
- 
-    <!-- Setup panel -->
-    <div class="publish-setup">
-      <h2>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--m)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        Session Setup
-      </h2>
-      <div class="form-row" style="max-width:480px;">
-        <div class="form-group">
-          <label>Academic Year</label>
-          <select id="sel-year">
-            <option value="">-- Select Year --</option>
-            <option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option>
-          </select>
+
+    <!-- Filter Section -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="filter-section">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="search-published" placeholder="Search student or major...">
         </div>
-        <div class="form-group">
-          <label>Term</label>
-          <select id="sel-term">
-            <option value="">-- Select Term --</option>
-            <option>Term 1</option><option>Term 2</option><option>Term 3</option>
-          </select>
-        </div>
-      </div>
-      <div style="display: flex; gap: 12px; align-items: center;">
-        <button class="btn btn-primary" id="btn-load">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.39"/></svg>
-          Load Students
-        </button>
-        <button class="btn btn-outline" id="btn-expand-all" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          Expand All
-        </button>
-        <button class="btn btn-outline" id="btn-collapse-all" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
-          Collapse All
+        <select id="filter-published-year">
+          <option value="">All Years</option>
+          <option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option>
+        </select>
+        <select id="filter-published-term">
+          <option value="">All Terms</option>
+          <option>Term 1</option><option>Term 2</option><option>Term 3</option>
+        </select>
+        <select id="filter-published-major">
+          <option value="">All Majors</option>
+        </select>
+        <button class="btn btn-outline btn-sm" id="reset-published-filters">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+          Reset
         </button>
       </div>
     </div>
- 
-    <!-- Result entry area -->
-    <div id="result-area" style="display:none;">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <div class="card-title-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <span id="result-title">Score Entry</span>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <span class="badge badge-gold" id="student-count-badge">0 students</span>
-          </div>
-        </div>
- 
-        <!-- Overall Progress -->
-        <div class="overall-progress" id="overall-progress">
-          <div class="progress-header">
-            <span>Overall Completion</span>
-            <span><span id="progress-text">0 / 0</span> · <span id="progress-pct">0%</span></span>
-          </div>
-          <div class="progress-bar-wrap">
-            <div class="progress-bar-fill" id="overall-bar" style="width:0%"></div>
-          </div>
-        </div>
- 
-        <!-- Student blocks container -->
-        <div id="student-blocks"></div>
- 
-        <div class="action-bar">
-          <button class="btn btn-outline" id="btn-save-draft">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Save as Draft
-          </button>
-          <button class="btn btn-success" id="btn-publish">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-            Publish Results
-          </button>
-        </div>
+
+    <!-- Statistics Summary -->
+    <div class="stats-summary" id="published-stats">
+      <div class="stat-summary-card">
+        <div class="stat-summary-value" id="total-published-sessions">0</div>
+        <div class="stat-summary-label">Published Sessions</div>
+      </div>
+      <div class="stat-summary-card">
+        <div class="stat-summary-value" id="total-published-students">0</div>
+        <div class="stat-summary-label">Students Assessed</div>
+      </div>
+      <div class="stat-summary-card">
+        <div class="stat-summary-value" id="overall-avg-gpa">0.0</div>
+        <div class="stat-summary-label">Overall GPA</div>
+      </div>
+      <div class="stat-summary-card">
+        <div class="stat-summary-value" id="total-subjects-assessed">0</div>
+        <div class="stat-summary-label">Subjects Assessed</div>
       </div>
     </div>
- 
-    <div class="empty-state" id="no-students-msg" style="display:none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      <p>No students found for the selected year and term. Please check Manage Students.</p>
+
+    <!-- Published Results List -->
+    <div id="published-results-container"></div>
+
+    <div class="empty-state" id="no-published-msg" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      <p>No published results yet. Go to Create Result to publish your first results.</p>
+      <button class="btn btn-primary" onclick="window.location.href='a_createResult.html'" style="margin-top:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Create New Result
+      </button>
     </div>
- 
+
   </main>
 </div>
- 
-<!-- Publish Confirm -->
-<div class="modal-overlay" id="modal-publish-confirm">
-  <div class="modal confirm-modal">
-    <div class="confirm-icon" style="background:rgba(30,123,72,0.12);">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+
+<!-- View Scores Modal -->
+<div class="modal-overlay" id="modal-view-scores">
+  <div class="modal subjects-modal">
+    <div class="modal-header">
+      <div class="modal-title" id="scores-modal-title">Student Scores</div>
+      <button class="modal-close" onclick="closeModal('modal-view-scores')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-    <div class="modal-title">Publish Results?</div>
-    <p id="publish-confirm-text">This will finalize and publish the results for all listed students.</p>
+    <div class="subject-list" id="scores-list"></div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-publish-confirm')">Cancel</button>
-      <button class="btn btn-success" id="btn-yes-publish">Yes, Publish</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-view-scores')">Close</button>
     </div>
   </div>
 </div>
- 
+
 <div id="toast-container" class="toast-container"></div>
 <script src="a_shared.js"></script>
 <script src="a_resultPublish.js"></script>
