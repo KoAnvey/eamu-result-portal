@@ -43,15 +43,14 @@ body {
   top: 0;
   z-index: 100;
 }
-  .logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--white);
-      box-shadow: var(--sh-sm);
-      background: #f3ede8;
-  }
+.logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--wh);
+  background: #f3ede8;
+}
 .nav-brand {
   display: flex;
   flex-direction: column;
@@ -195,12 +194,8 @@ body {
   flex-shrink: 0;
 }
 @keyframes pulse {
-  from {
-    opacity: 0.5;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0.5; }
+  to { opacity: 1; }
 }
 
 /* CARD */
@@ -212,12 +207,7 @@ body {
 }
 .card-accent {
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--m) 0%,
-    var(--m4) 60%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, var(--m) 0%, var(--m4) 60%, transparent 100%);
 }
 .card-body {
   padding: 28px 30px;
@@ -468,25 +458,38 @@ tbody tr:hover td {
   font-weight: 800;
   font-size: 12px;
 }
-.gA {
-  background: var(--m);
+/* Grade Colors - Matching Admin Site */
+.grade-Aplus {
+  background: linear-gradient(135deg, #1e7b48, #166b3e);
   color: #fff;
 }
-.gB {
+.grade-A {
   background: var(--ok2);
   color: var(--ok);
 }
-.gC {
+.grade-Bplus {
+  background: #e6f1fb;
+  color: #0d6efd;
+}
+.grade-B {
+  background: #e6f1fb;
+  color: #0d6efd;
+}
+.grade-Cplus {
+  background: var(--m3);
+  color: var(--m);
+}
+.grade-C {
+  background: var(--m3);
+  color: var(--m);
+}
+.grade-D {
   background: var(--warn2);
   color: var(--warn);
 }
-.gD {
-  background: #ffe6e5;
-  color: #b91c1c;
-}
-.gF {
-  background: #f3e6e6;
-  color: #b00020;
+.grade-F {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
 }
 .empty-td {
   text-align: center;
