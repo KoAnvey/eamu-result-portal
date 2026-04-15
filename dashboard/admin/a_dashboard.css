@@ -656,8 +656,8 @@ tbody td {
   color: var(--warning);
 }
 
-/* Grade badges */
-.grade-A\+ {
+/* Grade badges - Enhanced */
+.grade-Aplus {
   background: var(--ok2);
   color: #166b3e;
 }
@@ -665,9 +665,17 @@ tbody td {
   background: var(--ok2);
   color: var(--ok);
 }
+.grade-Bplus {
+  background: #e6f1fb;
+  color: var(--info);
+}
 .grade-B {
   background: #e6f1fb;
   color: var(--info);
+}
+.grade-Cplus {
+  background: var(--m3);
+  color: var(--m);
 }
 .grade-C {
   background: var(--m3);
@@ -685,6 +693,17 @@ tbody td {
   background: var(--s1);
   color: var(--ink3);
 }
+
+/* Grade pill styles for create result */
+.gp-Ap { background: var(--ok2); color: #166b3e; }
+.gp-A { background: var(--ok2); color: var(--ok); }
+.gp-Bp { background: #e6f1fb; color: var(--info); }
+.gp-B { background: #e6f1fb; color: var(--info); }
+.gp-Cp { background: var(--m3); color: var(--m); }
+.gp-C { background: var(--m3); color: var(--m); }
+.gp-D { background: var(--warn2); color: var(--warning); }
+.gp-F { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+.gp-empty { background: var(--s1); color: var(--ink3); }
 
 /* ════════════════════════════════════════
    MODALS

@@ -7,7 +7,9 @@ function gradeClass(grade) {
   const map = {
     "A+": "gp-Ap",
     "A": "gp-A",
+    "B+": "gp-Bp",
     "B": "gp-B",
+    "C+": "gp-Cp",
     "C": "gp-C",
     "D": "gp-D",
     "F": "gp-F",
@@ -34,7 +36,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnPublish = document.getElementById("btn-publish");
   const btnExpandAll = document.getElementById("btn-expand-all");
   const btnCollapseAll = document.getElementById("btn-collapse-all");
-  const warningBanner = document.getElementById("already-published-warning");
+  const sessionNotice = document.getElementById("session-notice");
+
+  function showSessionNotice(type, title, message) {
+    if (!sessionNotice) return;
+    
+    sessionNotice.classList.remove('info', 'success', 'warning', 'error', 'neutral');
+    sessionNotice.classList.add('notice-banner', type);
+    
+    const iconSvg = sessionNotice.querySelector('.notice-banner-icon svg');
+    if (iconSvg) {
+      if (type === 'success') {
+        iconSvg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+      } else if (type === 'warning') {
+        iconSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+      } else if (type === 'error') {
+        iconSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+      } else if (type === 'info') {
+        iconSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>';
+      } else {
+        iconSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>';
+      }
+    }
+    
+    document.getElementById("notice-title").textContent = title;
+    document.getElementById("notice-message").textContent = message;
+    sessionNotice.style.display = "flex";
+  }
+
+  function hideSessionNotice() {
+    if (sessionNotice) sessionNotice.style.display = "none";
+  }
 
   function checkForDraftOnLoad() {
     const draftKey = sessionStorage.getItem("loadDraftKey");
@@ -46,7 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
         selTerm.value = term;
         setTimeout(() => {
           if (btnLoad) btnLoad.click();
-          showToast(`Loaded draft for ${year} · ${term}`, "success");
+          setTimeout(() => {
+            showSessionNotice('neutral', 'Draft Loaded', `Continuing work on ${year} · ${term}. Enter scores and publish when ready.`);
+          }, 500);
         }, 100);
       }
     }
@@ -58,17 +92,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const term = selTerm.value;
 
       if (!year || !term) {
-        showToast("Please select both year and term.", "error");
+        showToast("Please select both academic year and term.", "error");
         return;
       }
 
       const isPublished = isSessionPublished(year, term);
       
       if (isPublished) {
-        if (warningBanner) warningBanner.style.display = "block";
-        showToast(`Results for ${year} · ${term} are already published and cannot be modified.`, "error");
+        showSessionNotice('info', 'Published Session — Editable', 
+          `${year} · ${term} results have been previously published. You may edit scores below. After making changes, click "Publish Results" to update the official record.`);
       } else {
-        if (warningBanner) warningBanner.style.display = "none";
+        hideSessionNotice();
       }
 
       const all = loadStudents();
@@ -79,26 +113,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (filtered.length === 0) {
         if (noStudentsMsg) noStudentsMsg.style.display = "block";
-        showToast(`No students found for ${year} · ${term}. Please add students first.`, "error");
+        showToast(`No students enrolled for ${year} · ${term}. Please register students first.`, "error");
         return;
       }
 
       currentSession = { year, term, students: filtered, isPublished };
       
-      if (resultTitle) resultTitle.textContent = `Score Entry — ${year} · ${term}`;
+      if (resultTitle) resultTitle.textContent = `Score Entry — ${year} · ${term}${isPublished ? ' (Published - Editable)' : ''}`;
       if (studentCountBadge) studentCountBadge.textContent = `${filtered.length} student${filtered.length > 1 ? "s" : ""}`;
 
-      buildStudentBlocks(filtered, isPublished);
+      buildStudentBlocks(filtered);
       if (resultArea) resultArea.style.display = "block";
       updateOverallStats();
       
-      if (!isPublished) {
-        showToast(`Loaded ${filtered.length} students for ${year} · ${term}. Enter scores below.`, "success");
-      }
+      showToast(`Loaded ${filtered.length} students for ${year} · ${term}`, "success");
     });
   }
 
-  function buildStudentBlocks(students, isPublished) {
+  function buildStudentBlocks(students) {
     if (!studentBlocksContainer) return;
     studentBlocksContainer.innerHTML = "";
 
@@ -106,11 +138,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const subjects = getSubjectsForYearTerm(student.major, student.year, student.term);
       const initials = student.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
       const safeSid = safeId(student.id);
-      const blockId = "block-" + safeSid;
+
+      const scores = loadScores();
+      const studentScores = [];
+      subjects.forEach(subj => {
+        const key = scoreKey(student.id, subj);
+        const score = scores[key];
+        if (score !== undefined && score !== "") {
+          studentScores.push(score);
+        }
+      });
+      const currentGPA = calculateGPA(studentScores);
+      const gpaLetter = getLetterGradeFromGPA(currentGPA);
 
       const block = document.createElement("div");
       block.className = "student-block";
-      block.id = blockId;
+      block.id = "block-" + safeSid;
 
       const header = document.createElement("div");
       header.className = "student-block-header";
@@ -119,11 +162,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="s-avatar">${escapeHtml(initials)}</div>
           <div>
             <div class="s-name">${escapeHtml(student.name)}</div>
-            <div class="s-id">${escapeHtml(student.id)} &nbsp;·&nbsp; ${escapeHtml(student.major)}</div>
+            <div class="s-id">${escapeHtml(student.id)} · ${escapeHtml(student.major)}</div>
           </div>
         </div>
         <div class="s-right">
-          <span class="s-avg-chip" id="avg-${safeSid}">Avg: —</span>
+          <span class="s-avg-chip" id="avg-${safeSid}">GPA: ${currentGPA.toFixed(2)} (${gpaLetter})</span>
           <div class="s-progress">
             <div class="s-pbar-wrap">
               <div class="s-pbar-fill" id="pbar-${safeSid}" style="width:0%"></div>
@@ -145,9 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
       rowsDiv.className = "subject-rows";
 
       subjects.forEach((subj, idx) => {
-        const scores = loadScores();
-        const skey = scoreKey(student.id, subj);
-        const existing = scores[skey] !== undefined ? scores[skey] : "";
+        const key = scoreKey(student.id, subj);
+        const existing = scores[key] !== undefined ? scores[key] : "";
         const grade = getGrade(existing);
         const gClass = gradeClass(grade);
         const inputId = "inp-" + safeSid + "-" + safeId(subj);
@@ -161,21 +203,12 @@ document.addEventListener("DOMContentLoaded", () => {
             ${escapeHtml(subj)}
           </div>
           <div class="score-wrap">
-            <input
-              type="number"
-              id="${inputId}"
-              min="0" max="100" step="1"
-              value="${existing}"
-              placeholder="Enter score"
-              data-sid="${student.id}"
-              data-subj="${escapeHtml(subj)}"
-              data-gradeid="${gradeId}"
-              data-blockid="${blockId}"
-              ${isPublished ? 'disabled style="opacity:0.6;"' : ''}>
+            <input type="number" id="${inputId}" min="0" max="100" step="1"
+              value="${existing}" placeholder="Enter score"
+              data-sid="${student.id}" data-subj="${escapeHtml(subj)}"
+              data-gradeid="${gradeId}" data-blockid="block-${safeSid}">
           </div>
-          <div>
-            <div class="grade-pill ${gClass}" id="${gradeId}">${grade}</div>
-          </div>
+          <div><div class="grade-pill ${gClass}" id="${gradeId}">${grade}</div></div>
         `;
 
         rowsDiv.appendChild(row);
@@ -185,16 +218,14 @@ document.addEventListener("DOMContentLoaded", () => {
       block.appendChild(rowsDiv);
       studentBlocksContainer.appendChild(block);
 
-      if (!isPublished) {
-        subjects.forEach((subj) => {
-          const inputId = "inp-" + safeSid + "-" + safeId(subj);
-          const input = document.getElementById(inputId);
-          if (input) {
-            input.addEventListener("input", onScoreInput);
-            input.addEventListener("blur", onScoreBlur);
-          }
-        });
-      }
+      subjects.forEach((subj) => {
+        const inputId = "inp-" + safeSid + "-" + safeId(subj);
+        const input = document.getElementById(inputId);
+        if (input) {
+          input.addEventListener("input", onScoreInput);
+          input.addEventListener("blur", onScoreBlur);
+        }
+      });
 
       refreshStudentProgress(student);
     });
@@ -235,6 +266,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (student) refreshStudentProgress(student);
     }
     updateOverallStats();
+    
+    input.style.borderColor = "var(--ok)";
+    setTimeout(() => { if (input) input.style.borderColor = ""; }, 500);
   }
 
   function onScoreBlur(e) {
@@ -255,18 +289,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const safeSid = safeId(student.id);
 
     let filled = 0;
-    let sum = 0;
+    let studentScores = [];
+    
     subjects.forEach((subj) => {
       const v = scores[scoreKey(student.id, subj)];
       if (v !== undefined && v !== "") {
         filled++;
-        sum += v;
+        studentScores.push(v);
       }
     });
 
     const total = subjects.length;
     const pct = total > 0 ? Math.round((filled / total) * 100) : 0;
-    const avg = filled > 0 ? (sum / filled).toFixed(1) : "—";
+    const gpa = calculateGPA(studentScores);
+    const gpaLetter = getLetterGradeFromGPA(gpa);
 
     const pbar = document.getElementById("pbar-" + safeSid);
     const pcount = document.getElementById("pcount-" + safeSid);
@@ -274,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (pbar) pbar.style.width = pct + "%";
     if (pcount) pcount.textContent = `${filled}/${total}`;
-    if (avgEl) avgEl.textContent = `Avg: ${avg}`;
+    if (avgEl) avgEl.textContent = `GPA: ${gpa.toFixed(2)} (${gpaLetter})`;
   }
 
   function updateOverallStats() {
@@ -285,6 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let entered = 0;
     let total = 0;
+    let allScores = [];
 
     students.forEach((student) => {
       const subjects = getSubjectsForYearTerm(student.major, student.year, student.term);
@@ -293,14 +330,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const v = scores[scoreKey(student.id, subj)];
         if (v !== undefined && v !== "") {
           entered++;
+          allScores.push(v);
         }
       });
     });
 
     const pct = total > 0 ? Math.round((entered / total) * 100) : 0;
+    const overallGPA = calculateGPA(allScores);
+    const overallGpaLetter = getLetterGradeFromGPA(overallGPA);
     
     if (overallBar) overallBar.style.width = pct + "%";
-    if (progressText) progressText.textContent = `${entered} / ${total} scores entered`;
+    if (progressText) progressText.innerHTML = `${entered} / ${total} scores | GPA: ${overallGPA.toFixed(2)} (${overallGpaLetter})`;
     if (progressPct) progressPct.textContent = `${pct}%`;
   }
 
@@ -323,25 +363,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       
-      if (currentSession.isPublished) {
-        showToast("Cannot save draft for already published results.", "error");
-        return;
-      }
-      
       const drafts = loadDrafts();
       const key = `${currentSession.year}|${currentSession.term}`;
       const idx = drafts.findIndex((d) => d.key === key);
       const draft = {
-        key,
-        year: currentSession.year,
-        term: currentSession.term,
-        savedAt: new Date().toISOString(),
-        studentCount: currentSession.students.length,
+        key, year: currentSession.year, term: currentSession.term,
+        savedAt: new Date().toISOString(), studentCount: currentSession.students.length,
       };
       if (idx >= 0) drafts[idx] = draft;
       else drafts.push(draft);
       saveDrafts(drafts);
-      showToast("Draft saved successfully. You can continue later from My Drafts.", "success");
+      showToast("Draft saved successfully.", "success");
     });
   }
 
@@ -352,14 +384,22 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       
-      if (currentSession.isPublished) {
-        showToast(`Results for ${currentSession.year} · ${currentSession.term} are already published.`, "error");
-        return;
-      }
+      const scores = loadScores();
+      let allScores = [];
+      currentSession.students.forEach((student) => {
+        const subjects = getSubjectsForYearTerm(student.major, student.year, student.term);
+        subjects.forEach((subj) => {
+          const v = scores[scoreKey(student.id, subj)];
+          if (v !== undefined && v !== "") allScores.push(v);
+        });
+      });
+      const overallGPA = calculateGPA(allScores);
+      const overallGpaLetter = getLetterGradeFromGPA(overallGPA);
       
+      const isUpdate = currentSession.isPublished;
       const confirmText = document.getElementById("publish-confirm-text");
       if (confirmText) {
-        confirmText.textContent = `Publish all results for ${currentSession.year}, ${currentSession.term}? This will finalize the results and they will appear in Published Results.`;
+        confirmText.innerHTML = `${isUpdate ? 'Update' : 'Publish'} results for ${currentSession.year}, ${currentSession.term}?<br><strong>Overall GPA: ${overallGPA.toFixed(2)} (${overallGpaLetter})</strong><br>This action will ${isUpdate ? 'replace previously published' : 'finalize the'} results.`;
       }
       openModal("modal-publish-confirm");
     });
@@ -375,27 +415,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const idx = published.findIndex((p) => p.key === key);
       
       const entry = {
-        key,
-        year: currentSession.year,
-        term: currentSession.term,
-        publishedAt: new Date().toISOString(),
-        studentCount: currentSession.students.length,
+        key, year: currentSession.year, term: currentSession.term,
+        publishedAt: new Date().toISOString(), studentCount: currentSession.students.length,
+        lastUpdated: new Date().toISOString(),
       };
       
-      if (idx >= 0) published[idx] = entry;
-      else published.push(entry);
+      if (idx >= 0) {
+        published[idx] = entry;
+        showSessionNotice('success', 'Results Updated', `${currentSession.year} · ${currentSession.term} results have been successfully updated.`);
+      } else {
+        published.push(entry);
+        showSessionNotice('success', 'Results Published', `${currentSession.year} · ${currentSession.term} results have been successfully published.`);
+      }
       savePublished(published);
-
       saveDrafts(loadDrafts().filter((d) => d.key !== key));
-
       closeModal("modal-publish-confirm");
-      showToast(`Results for ${currentSession.year} · ${currentSession.term} published successfully!`, "success");
       
-      if (resultArea) resultArea.style.display = "none";
-      currentSession = null;
-      
-      if (selYear) selYear.value = "";
-      if (selTerm) selTerm.value = "";
+      currentSession.isPublished = true;
+      if (resultTitle) resultTitle.textContent = `Score Entry — ${currentSession.year} · ${currentSession.term} (Published - Editable)`;
     });
   }
 
@@ -410,10 +447,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function escapeHtml(str) {
   if (!str) return "";
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }

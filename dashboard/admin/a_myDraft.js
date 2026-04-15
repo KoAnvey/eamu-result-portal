@@ -10,10 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   function render() {
-    const drafts = loadDrafts();
+    const drafts    = loadDrafts();
+    const published = loadPublished();
  
     // ── Drafts ──────────────────────────────────────────────
-    const grid = document.getElementById("draft-grid");
+    const grid  = document.getElementById("draft-grid");
     const empty = document.getElementById("draft-empty");
     const draftCount = document.getElementById("draft-count");
     
@@ -23,10 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
  
     if (drafts.length === 0) {
       if (grid) grid.innerHTML = "";
-      if (empty) empty.style.display = "flex";
-      if (empty) empty.style.flexDirection = "column";
-      if (empty) empty.style.alignItems = "center";
-      if (empty) empty.style.justifyContent = "center";
+      if (empty) empty.style.display = "block";
     } else {
       if (empty) empty.style.display = "none";
       if (grid) {
@@ -39,28 +37,49 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="draft-actions">
               <button class="btn btn-primary btn-sm" onclick="continueDraft('${d.key}')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Continue Editing
               </button>
               <button class="btn btn-danger btn-sm" onclick="deleteDraft('${d.key}','${escapeHtml(d.year)} · ${escapeHtml(d.term)}')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6"/>
-                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
                 Delete
               </button>
             </div>
           </div>`).join("");
       }
     }
+ 
+    // ── Published ───────────────────────────────────────────
+    const ptbody = document.getElementById("published-tbody");
+    const pempty = document.getElementById("published-empty");
+ 
+    if (published.length === 0) {
+      if (ptbody) ptbody.innerHTML = "";
+      if (pempty) pempty.style.display = "block";
+    } else {
+      if (pempty) pempty.style.display = "none";
+      if (ptbody) {
+        ptbody.innerHTML = published.map((p, i) => `
+          <tr>
+            <td class="td-id">${i+1}</td>
+            <td class="td-name">${escapeHtml(p.year)}</td>
+            <td>${escapeHtml(p.term)}</td>
+            <td>${p.studentCount} student${p.studentCount !== 1 ? "s" : ""}</td>
+            <td style="color:var(--ink3);font-size:0.82rem;">${formatDate(p.publishedAt)}</td>
+            <td><span class="badge badge-green">
+              <span class="status-dot" style="background:var(--ok);display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;"></span>
+              Published
+            </span></td>
+          </tr>`).join("");
+      }
+    }
   }
  
-  // Continue editing a draft - redirect to createResult with draft info
+  // Continue editing a draft - redirect to result publish with draft info
   window.continueDraft = (draftKey) => {
+    // Store the draft key in sessionStorage so resultPublish can load it
     sessionStorage.setItem("loadDraftKey", draftKey);
+    // Redirect to result publish page
     window.location.href = "a_createResult.html";
   };
  

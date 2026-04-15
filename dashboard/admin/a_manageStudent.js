@@ -17,7 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
       sel.appendChild(opt);
     });
   });
-
+  const emptyAddBtn = document.getElementById("empty-add-btn");
+  if (emptyAddBtn) {
+    emptyAddBtn.addEventListener("click", () => {
+      document.getElementById("btn-add-student").click();
+    });
+  }
   // ── Render Table ──────────────────────────────────────────
   function renderTable() {
     const tbody = document.getElementById("student-tbody");

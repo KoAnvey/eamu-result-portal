@@ -1,5 +1,5 @@
 // ============================================================
-//  EAMU — Shared Data & Utilities (Enhanced)
+//  EAMU — Shared Data & Utilities (Professional Edition)
 // ============================================================
 
 // ── Majors and their subjects ──────────────────────────────
@@ -119,7 +119,6 @@ const MAJORS = {
 
 const MAJOR_KEYS = Object.keys(MAJORS);
 
-// Add helper function to get subjects for a specific year+term
 function getSubjectsForYearTerm(major, year, term) {
   if (!MAJORS[major]) return [];
   const yearData = MAJORS[major][year];
@@ -132,10 +131,13 @@ function getGrade(score) {
   if (score === null || score === undefined || score === "") return "—";
   const s = parseFloat(score);
   if (isNaN(s)) return "—";
-  if (s >= 90) return "A+";
-  if (s >= 80) return "A";
-  if (s >= 70) return "B";
-  if (s >= 60) return "C";
+  
+  if (s >= 80) return "A+";
+  if (s >= 75) return "A";
+  if (s >= 70) return "B+";
+  if (s >= 65) return "B";
+  if (s >= 60) return "C+";
+  if (s >= 55) return "C";
   if (s >= 50) return "D";
   return "F";
 }
@@ -143,11 +145,14 @@ function getGrade(score) {
 function getGradeClass(grade) {
   const map = {
     "A+": "grade-Aplus",
-    A: "grade-A",
-    B: "grade-B",
-    C: "grade-C",
-    D: "grade-D",
-    F: "grade-F",
+    "A": "grade-A",
+    "B+": "grade-Bplus",
+    "B": "grade-B",
+    "C+": "grade-Cplus",
+    "C": "grade-C",
+    "D": "grade-D",
+    "F": "grade-F",
+    "—": "grade-IP",
   };
   return map[grade] || "grade-IP";
 }
@@ -155,14 +160,78 @@ function getGradeClass(grade) {
 function gradeColor(grade) {
   const map = {
     "A+": "#5fd99a",
-    A: "#4caf7d",
-    B: "#4a90d9",
-    C: "#c9a84c",
-    D: "#e0a050",
-    F: "#e05c5c",
+    "A": "#4caf7d",
+    "B+": "#6ab0e6",
+    "B": "#4a90d9",
+    "C+": "#d4b85c",
+    "C": "#c9a84c",
+    "D": "#e0a050",
+    "F": "#e05c5c",
     "—": "#7a90ab",
   };
   return map[grade] || "#7a90ab";
+}
+
+// ── GPA Calculator ─────────────────────────────────────────
+function getGradePoint(grade) {
+  const map = {
+    "A+": 4.0,
+    "A": 4.0,
+    "B+": 3.5,
+    "B": 3.0,
+    "C+": 2.5,
+    "C": 2.0,
+    "D": 1.0,
+    "F": 0.0,
+    "—": 0.0,
+  };
+  return map[grade] || 0.0;
+}
+
+function calculateGPA(scores) {
+  if (!scores || scores.length === 0) return 0;
+  
+  let totalPoints = 0;
+  let totalCredits = scores.length;
+  
+  scores.forEach(score => {
+    const grade = getGrade(score);
+    const gradePoint = getGradePoint(grade);
+    totalPoints += gradePoint;
+  });
+  
+  return totalCredits > 0 ? parseFloat((totalPoints / totalCredits).toFixed(2)) : 0;
+}
+
+function calculateStudentGPA(studentId, year, term) {
+  const scores = loadScores();
+  const student = loadStudents().find(s => s.id === studentId);
+  if (!student) return 0;
+  
+  const subjects = getSubjectsForYearTerm(student.major, year, term);
+  const studentScores = [];
+  
+  subjects.forEach(subj => {
+    const key = scoreKey(studentId, subj);
+    const score = scores[key];
+    if (score !== undefined && score !== "") {
+      studentScores.push(score);
+    }
+  });
+  
+  return calculateGPA(studentScores);
+}
+
+function getLetterGradeFromGPA(gpa) {
+  const g = parseFloat(gpa);
+  if (g >= 3.67) return "A+";
+  if (g >= 3.33) return "A";
+  if (g >= 3.0) return "B+";
+  if (g >= 2.67) return "B";
+  if (g >= 2.33) return "C+";
+  if (g >= 2.0) return "C";
+  if (g >= 1.0) return "D";
+  return "F";
 }
 
 // ── LocalStorage helpers ───────────────────────────────────
@@ -191,12 +260,10 @@ function saveDrafts(arr) {
   localStorage.setItem("eamu_drafts", JSON.stringify(arr));
 }
 
-// ── Score key: studentId + subject ────────────────────────
 function scoreKey(enrollmentId, subject) {
   return `${enrollmentId}|${subject}`;
 }
 
-// ── Helper: Check if results are published for a session ───
 function isSessionPublished(year, term) {
   const published = loadPublished();
   return published.some((p) => p.year === year && p.term === term);
@@ -212,7 +279,7 @@ function showToast(msg, type = "info") {
     document.body.appendChild(container);
   }
   const icons = {
-    success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+    success: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`,
     error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
     info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
   };
@@ -228,7 +295,6 @@ function showToast(msg, type = "info") {
   }, 3000);
 }
 
-// ── Modal helpers ──────────────────────────────────────────
 function openModal(id) {
   const el = document.getElementById(id);
   if (el) el.classList.add("open");
@@ -238,7 +304,6 @@ function closeModal(id) {
   if (el) el.classList.remove("open");
 }
 
-// ── Hamburger nav toggle ───────────────────────────────────
 function initHamburger() {
   const btn = document.getElementById("hamburger");
   const nav = document.getElementById("topbar-nav");
@@ -249,7 +314,6 @@ function initHamburger() {
   });
 }
 
-// ── Highlight active nav link ──────────────────────────────
 function highlightNav() {
   const page = location.pathname.split("/").pop() || "a_dashboard.html";
   document.querySelectorAll(".topbar-nav a").forEach((a) => {
@@ -257,19 +321,14 @@ function highlightNav() {
   });
 }
 
-// ── Format date helper ─────────────────────────────────────
 function formatDate(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
-  return (
-    d.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }) +
-    " " +
-    d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
-  );
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }) + " " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -13,21 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentViewingStudent = null;
 
-  function calculateGPA(scores) {
-    if (!scores.length) return 0;
-    const gradePoints = { "A+": 4.0, "A": 4.0, "B": 3.0, "C": 2.0, "D": 1.0, "F": 0.0, "—": 0 };
-    let total = 0;
-    let count = 0;
-    scores.forEach(s => {
-      const grade = getGrade(s.score);
-      if (grade !== "—") {
-        total += gradePoints[grade] || 0;
-        count++;
-      }
-    });
-    return count > 0 ? (total / count).toFixed(2) : 0;
-  }
-
   function render() {
     const published = loadPublished();
     const students = loadStudents();
@@ -91,15 +76,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const key = scoreKey(student.id, subj);
             const score = scores[key];
             if (score !== undefined && score !== "") {
-              studentScores.push({ subject: subj, score: score, grade: getGrade(score) });
+              studentScores.push(score);
               totalSubjectsCount++;
             }
           });
           
           const gpa = calculateGPA(studentScores);
-          sessionGPASum += parseFloat(gpa);
+          const gpaLetter = getLetterGradeFromGPA(gpa);
+          sessionGPASum += gpa;
           sessionGPACount++;
-          totalGPASum += parseFloat(gpa);
+          totalGPASum += gpa;
           totalGPACount++;
           
           studentsHtml += `
@@ -110,8 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="student-major">${escapeHtml(student.major)}</div>
               </div>
               <div class="student-gpa">
-                <div class="gpa-value">${gpa}</div>
-                <div class="gpa-label">GPA</div>
+                <div class="gpa-value">${gpa.toFixed(2)}</div>
+                <div class="gpa-label">GPA (${gpaLetter})</div>
               </div>
               <div class="view-scores-btn">
                 <button class="btn btn-outline btn-sm" onclick="viewStudentScores('${student.id}', '${escapeHtml(student.name)}', '${session.year}', '${session.term}')">
@@ -124,6 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         
         const sessionAvgGPA = sessionGPACount > 0 ? (sessionGPASum / sessionGPACount).toFixed(2) : "0.00";
+        const sessionAvgLetter = getLetterGradeFromGPA(sessionAvgGPA);
         
         sessionsHtml += `
           <div class="result-card" data-session="${sessionKey}">
@@ -136,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   Published: ${formatDate(session.publishedAt)}
                 </div>
                 <span class="student-count">${filteredStudents.length} student${filteredStudents.length !== 1 ? "s" : ""}</span>
-                <span class="student-count" style="background:var(--ok2);color:var(--ok);">Avg GPA: ${sessionAvgGPA}</span>
+                <span class="student-count" style="background:var(--ok2);color:var(--ok);">Avg GPA: ${sessionAvgGPA} (${sessionAvgLetter})</span>
               </div>
               <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
                 <polyline points="6 9 12 15 18 9"/>
@@ -156,7 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("total-published-students").textContent = totalStudentsAssessed;
       document.getElementById("total-subjects-assessed").textContent = totalSubjectsCount;
       const overallAvgGPA = totalGPACount > 0 ? (totalGPASum / totalGPACount).toFixed(2) : "0.00";
-      document.getElementById("overall-avg-gpa").textContent = overallAvgGPA;
+      const overallAvgLetter = getLetterGradeFromGPA(overallAvgGPA);
+      document.getElementById("overall-avg-gpa").innerHTML = `${overallAvgGPA} <span style="font-size:0.7rem;">(${overallAvgLetter})</span>`;
     }
   }
 
@@ -175,14 +163,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const key = scoreKey(student.id, subj);
       const score = scores[key];
       if (score !== undefined && score !== "") {
-        scoresList.push({ subject: subj, score: score, grade: getGrade(score) });
+        const grade = getGrade(score);
+        scoresList.push({ subject: subj, score: score, grade: grade });
       }
     });
+    
+    // Calculate GPA for this student
+    const studentScores = scoresList.map(s => s.score);
+    const gpa = calculateGPA(studentScores);
+    const gpaLetter = getLetterGradeFromGPA(gpa);
     
     const modalTitle = document.getElementById("scores-modal-title");
     const scoresContainer = document.getElementById("scores-list");
     
-    if (modalTitle) modalTitle.textContent = `${escapeHtml(studentName)} - ${year} · ${term}`;
+    if (modalTitle) modalTitle.innerHTML = `${escapeHtml(studentName)} - ${year} · ${term} <span style="font-size:0.8rem;color:var(--ok);">(GPA: ${gpa.toFixed(2)} - ${gpaLetter})</span>`;
     
     if (scoresContainer) {
       if (scoresList.length === 0) {
