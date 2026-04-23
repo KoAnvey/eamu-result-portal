@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="login.css" />
+    <title>Admin Login</title>
+  </head>
+  <body>
+
+    <main class="student-login">
+      <section class="login-card">
+        <!-- Logo -->
+        <img src="../image/eamuLogo.jpg" alt="EAMU Logo" class="logo">
+
+        <!-- Heading -->
+        <h1>Admin Portal</h1>
+        <p>Enter your credentials and OTP to access the admin dashboard.</p>
+
+        <!-- Admin Login Form -->
+        <form id="admin_login_form">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter Username" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter Password" required />
+          </div>
+
+          <div class="form-group">
+            <label for="mobile">Mobile Number</label>
+            <div class="mobile-group">
+              <input type="tel" id="mobile" placeholder="Enter Mobile Number" pattern="[0-9]{10}" required />
+              <button type="button" id="sendOTP">Send OTP</button>
+            </div>
+          </div>
+
+          <div class="form-group otp-section">
+            <label>OTP</label>
+            <div class="otp-boxes">
+              <input type="text" maxlength="1" class="otp-input" />
+              <input type="text" maxlength="1" class="otp-input" />
+              <input type="text" maxlength="1" class="otp-input" />
+              <input type="text" maxlength="1" class="otp-input" />
+              <input type="text" maxlength="1" class="otp-input" />
+              <input type="text" maxlength="1" class="otp-input" />
+            </div>
+          </div>
+
+          <div class="form-group form-btn">
+            <button type="submit" id="adminLogin">Login</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const sendOTPBtn = document.getElementById('sendOTP');
+      const otpInputs = document.querySelectorAll('.otp-input');
+
+      // Send OTP demo
+      sendOTPBtn.addEventListener('click', () => {
+        const mobile = document.getElementById('mobile').value;
+        if (!mobile.match(/^[0-9]{10}$/)) {
+          alert('Enter a valid 10-digit mobile number');
+          return;
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        alert('OTP sent: ' + otp);
+
+        // Auto-fill OTP for demo
+        const otpStr = otp.toString().split('');
+        otpInputs.forEach((input, index) => input.value = otpStr[index]);
+      });
+
+      // Auto-focus OTP boxes
+      otpInputs.forEach((input, idx) => {
+        input.addEventListener('input', () => {
+          if (input.value.length === 1 && idx < otpInputs.length - 1) otpInputs[idx + 1].focus();
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && input.value === '' && idx > 0) {
+            otpInputs[idx - 1].focus();
+          }
+        });
+      });
+    </script>
+
+  </body>
+</html>

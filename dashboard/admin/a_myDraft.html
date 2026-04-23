@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Drafts · EAMU</title>
+  <link rel="stylesheet" href="a_dashboard.css">
+  <style>
+    .draft-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .draft-card {
+      background: var(--wh);
+      border: 1px solid var(--s2);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .draft-card:hover { border-color: var(--m4); transform: translateY(-2px); }
+    .draft-card::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(to bottom, var(--m2), var(--m));
+    }
+    .draft-label {
+      font-size: 0.7rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--warning);
+      font-weight: 600; margin-bottom: 8px;
+    }
+    .draft-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem; color: var(--ink);
+      font-weight: 700; margin-bottom: 6px;
+    }
+    .draft-meta {
+      font-size: 0.78rem; color: var(--ink3); margin-bottom: 16px;
+    }
+    .draft-actions { display: flex; gap: 8px; }
+    .empty-draft {
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .empty-draft svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      color: var(--ink4);
+    }
+    .empty-draft p {
+      color: var(--ink3);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+ 
+<header class="topbar">
+  <a href="a_dashboard.html" class="topbar-brand">
+    <div class="topbar-logo">
+      <img src="../../image/Logo.png">
+    </div>
+    <div>
+      <div class="topbar-name">EAMU</div>
+      <div class="topbar-tagline">Learn · Innovate · Succeed</div>
+    </div>
+  </a>
+  <div class="topbar-portal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Student Result Portal
+  </div>
+  <nav class="topbar-nav" id="topbar-nav">
+    <a href="a_dashboard.html">Home</a>
+    <a href="a_manageStudent.html">Manage Students</a>
+    <a href="a_createResult.html">Create Result</a>
+    <a href="a_resultPublish.html">Published Results</a>
+    <a href="a_myDraft.html">My Drafts</a>
+  </nav>
+  <div class="topbar-user">
+    <div class="topbar-avatar">KA</div>
+    <span class="topbar-username">Ko Anvey</span>
+    <button class="btn-logout" onclick="showToast('Logged out','success')">Logout</button>
+  </div>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</header>
+ 
+<div class="page-wrapper">
+  <main class="main-content">
+ 
+    <div class="page-header">
+      <div class="page-header-label">Workspace</div>
+      <h1>My Drafts</h1>
+      <p>Unsaved result sessions saved for later editing and publishing.</p>
+    </div>
+ 
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header" style="margin-bottom:0;">
+        <div class="card-title">
+          <div class="card-title-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          Saved Drafts
+        </div>
+        <span class="badge badge-orange" id="draft-count">0 drafts</span>
+      </div>
+    </div>
+ 
+    <div class="draft-grid" id="draft-grid"></div>
+ 
+    <div class="empty-draft" id="draft-empty" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      <p>No drafts saved yet.</p>
+    </div>
+ 
+  </main>
+</div>
+ 
+<!-- Delete Draft Confirm -->
+<div class="modal-overlay" id="modal-del-draft">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon" style="background:rgba(220,53,69,0.12);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      </svg>
+    </div>
+    <div class="modal-title">Delete Draft?</div>
+    <p id="del-draft-text">Are you sure you want to delete this draft?</p>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-del-draft')">Cancel</button>
+      <button class="btn btn-danger" id="btn-yes-del-draft">Delete</button>
+    </div>
+  </div>
+</div>
+ 
+<div id="toast-container" class="toast-container"></div>
+<script src="a_shared.js"></script>
+<script src="a_myDraft.js"></script>
+</body>
+</html>

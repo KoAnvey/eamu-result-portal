@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Result · EAMU</title>
+  <link rel="stylesheet" href="a_dashboard.css">
+  <style>
+    .publish-setup {
+      background: var(--wh);
+      border: 1px solid var(--s2);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .publish-setup h2 {
+      font-family: var(--font-display);
+      font-size: 1rem; color: var(--ink);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .result-table-wrap { overflow-x: auto; }
+    .score-input-cell { display: flex; align-items: center; gap: 6px; }
+    .grade-display {
+      display: inline-flex; align-items: center;
+      font-size: 0.8rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      min-width: 44px; justify-content: center;
+    }
+    .section-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 10px 0 6px;
+    }
+    .section-divider span {
+      font-size: 0.7rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--m);
+      font-weight: 600; white-space: nowrap;
+    }
+    .section-divider::before, .section-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: var(--s2);
+    }
+    .subject-group-header td {
+      background: var(--m3);
+      font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--m);
+      font-weight: 600; padding: 8px 16px;
+    }
+    .action-bar {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      align-items: center; margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--s2);
+    }
+    .avg-display {
+      font-family: var(--font-display);
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--m);
+    }
+    .avg-label { font-size: 0.75rem; color: var(--ink3); margin-top: 2px; }
+    .mini-stat {
+      text-align: center;
+      background: var(--s1);
+      border: 1px solid var(--s2);
+      border-radius: 10px; padding: 12px 18px;
+    }
+    .student-block {
+      background: var(--wh);
+      border: 1px solid var(--s2);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .student-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--s1);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .student-block-header:hover {
+      background: var(--m3);
+    }
+    .s-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .s-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--m), var(--m2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--wh);
+      font-size: 0.9rem;
+    }
+    .s-name {
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .s-id {
+      font-size: 0.7rem;
+      color: var(--ink3);
+    }
+    .s-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .s-avg-chip {
+      font-size: 0.75rem;
+      background: var(--m3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: var(--m);
+      font-weight: 600;
+    }
+    .s-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .s-pbar-wrap {
+      width: 80px;
+      height: 4px;
+      background: var(--s2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .s-pbar-fill {
+      height: 100%;
+      background: var(--m);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    .collapse-chevron {
+      transition: transform 0.2s;
+    }
+    .student-block.collapsed .collapse-chevron {
+      transform: rotate(-90deg);
+    }
+    .subject-rows {
+      padding: 0;
+      transition: all 0.2s;
+    }
+    .student-block.collapsed .subject-rows {
+      display: none;
+    }
+    .subject-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      border-top: 1px solid var(--s2);
+    }
+    .subject-row:hover {
+      background: var(--s1);
+    }
+    .subj-label {
+      flex: 1;
+      font-weight: 500;
+      color: var(--ink2);
+    }
+    .subj-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: var(--m3);
+      color: var(--m);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-right: 10px;
+    }
+    .score-wrap input {
+      width: 100px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .grade-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      min-width: 48px;
+      text-align: center;
+    }
+    .gp-Ap { background: var(--ok2); color: #166b3e; }
+    .gp-A { background: var(--ok2); color: var(--ok); }
+    .gp-B { background: #e6f1fb; color: var(--info); }
+    .gp-C { background: var(--m3); color: var(--m); }
+    .gp-D { background: var(--warn2); color: var(--warning); }
+    .gp-F { background: rgba(220,53,69,0.1); color: var(--danger); }
+    .gp-empty { background: var(--s1); color: var(--ink3); }
+    .score-error {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 2px rgba(220,53,69,0.2) !important;
+    }
+    .overall-progress {
+      background: var(--s1);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+    .progress-bar-wrap {
+      height: 6px;
+      background: var(--s2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--m);
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    .warning-banner {
+      background: var(--warn2);
+      border-left: 3px solid var(--warning);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: var(--warning);
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="a_dashboard.html" class="topbar-brand">
+    <div class="topbar-logo">
+      <img src="../../image/Logo.png">
+    </div>
+    <div>
+      <div class="topbar-name">EAMU</div>
+      <div class="topbar-tagline">Learn · Innovate · Succeed</div>
+    </div>
+  </a>
+  <div class="topbar-portal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Student Result Portal
+  </div>
+  <nav class="topbar-nav" id="topbar-nav">
+    <a href="a_dashboard.html">Home</a>
+    <a href="a_manageStudent.html">Manage Students</a>
+    <a href="a_createResult.html" class="active">Create Result</a>
+    <a href="a_resultPublish.html">Published Results</a>
+    <a href="a_myDraft.html">My Drafts</a>
+  </nav>
+  <div class="topbar-user">
+    <div class="topbar-avatar">KA</div>
+    <span class="topbar-username">Ko Anvey</span>
+    <button class="btn-logout" onclick="showToast('Logged out','success')">Logout</button>
+  </div>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</header>
+
+<div class="page-wrapper">
+  <main class="main-content">
+
+    <div class="page-header">
+      <div class="page-header-label">Result Management</div>
+      <h1>Create Result</h1>
+      <p>Select a year and term to enter scores, save as draft, or publish results.</p>
+    </div>
+
+    <!-- Setup panel -->
+    <div class="publish-setup">
+      <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--m)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Session Setup
+      </h2>
+      <div class="form-row" style="max-width:480px;">
+        <div class="form-group">
+          <label>Academic Year <span style="color:var(--danger);">*</span></label>
+          <select id="sel-year">
+            <option value="">-- Select Year --</option>
+            <option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Term <span style="color:var(--danger);">*</span></label>
+          <select id="sel-term">
+            <option value="">-- Select Term --</option>
+            <option>Term 1</option><option>Term 2</option><option>Term 3</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <button class="btn btn-primary" id="btn-load">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.39"/></svg>
+          Load Students
+        </button>
+        <button class="btn btn-outline" id="btn-expand-all" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          Expand All
+        </button>
+        <button class="btn btn-outline" id="btn-collapse-all" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+          Collapse All
+        </button>
+      </div>
+    </div>
+
+    <!-- Result entry area -->
+    <div id="result-area" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <span id="result-title">Score Entry</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="badge badge-gold" id="student-count-badge">0 students</span>
+          </div>
+        </div>
+
+        <div id="already-published-warning" class="warning-banner" style="display:none;">
+          ⚠️ Results for this session have already been published. You cannot modify published results.
+        </div>
+
+        <!-- Overall Progress -->
+        <div class="overall-progress" id="overall-progress">
+          <div class="progress-header">
+            <span>Overall Completion</span>
+            <span><span id="progress-text">0 / 0</span> · <span id="progress-pct">0%</span></span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="overall-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Student blocks container -->
+        <div id="student-blocks"></div>
+
+        <div class="action-bar">
+          <button class="btn btn-outline" id="btn-save-draft">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Save as Draft
+          </button>
+          <button class="btn btn-success" id="btn-publish">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Publish Results
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="no-students-msg" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <p>No students found for the selected year and term. Please check Manage Students.</p>
+      <button class="btn btn-primary" onclick="window.location.href='a_manageStudent.html'" style="margin-top:16px;">Add Students</button>
+    </div>
+
+  </main>
+</div>
+
+<!-- Publish Confirm -->
+<div class="modal-overlay" id="modal-publish-confirm">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon" style="background:rgba(30,123,72,0.12);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    </div>
+    <div class="modal-title">Publish Results?</div>
+    <p id="publish-confirm-text">This will finalize and publish the results for all listed students.</p>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-publish-confirm')">Cancel</button>
+      <button class="btn btn-success" id="btn-yes-publish">Yes, Publish</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="a_shared.js"></script>
+<script src="a_createResult.js"></script>
+</body>
+</html>
